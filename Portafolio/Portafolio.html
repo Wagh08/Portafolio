@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Portafolio</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;family=DM+Serif+Display&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            serif: ['DM Serif Display', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #7c3aed, #ec4899);
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after, .nav-link.active-link::after { width: 100%; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(3deg); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .animate-fade-up { animation: fadeUp 0.7s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .delay-4 { animation-delay: 0.4s; opacity: 0; }
+    .delay-5 { animation-delay: 0.5s; opacity: 0; }
+    .float-anim { animation: float 6s ease-in-out infinite; }
+    .shimmer-text {
+      background: linear-gradient(90deg, #c4b5fd, #f9a8d4, #93c5fd, #c4b5fd);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite;
+    }
+    .glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(124,58,237,0.2); }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f0a1e; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(#7c3aed, #ec4899); border-radius: 3px; }
+    .comment-card { transition: all 0.3s ease; }
+    .comment-card:hover { background: rgba(255,255,255,0.08); }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-[#0a0618] font-outfit text-gray-200 overflow-x-hidden">
+  <div id="app-wrapper" class="w-full h-full overflow-auto relative">
+   <!-- Orbs -->
+   <div class="orb w-96 h-96 bg-purple-600 top-0 left-[-10%] fixed"></div>
+   <div class="orb w-80 h-80 bg-blue-600 top-[40%] right-[-5%] fixed"></div>
+   <div class="orb w-72 h-72 bg-pink-500 bottom-0 left-[30%] fixed"></div><!-- Nav -->
+   <nav class="fixed top-0 left-0 w-full z-50 glass">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+     <button onclick="navigateTo('home')" class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">✦ Portafolio</button>
+     <div class="hidden md:flex gap-8 text-sm font-medium">
+      <button onclick="navigateTo('home')" class="nav-link" data-nav="home">Inicio</button> 
+      <button onclick="navigateTo('about')" class="nav-link" data-nav="about">Acerca de Mí</button> 
+      <button onclick="navigateTo('courses')" class="nav-link" data-nav="courses">Mis Cursos</button> 
+      <button onclick="navigateTo('university')" class="nav-link" data-nav="university">Vida Universitaria</button>
+      <button onclick="navigateTo('cs')" class="nav-link" data-nav="cs">Computación</button>
+      <button onclick="navigateTo('achievements')" class="nav-link" data-nav="achievements">Mis Logros</button>
+      <button onclick="navigateTo('semester')" class="nav-link" data-nav="semester">Lo que me Llevo</button>  
+      <button onclick="navigateTo('reflection')" class="nav-link" data-nav="reflection">Reflexión</button> 
+      <button onclick="navigateTo('comments')" class="nav-link" data-nav="comments">Comentarios</button>
+     </div>
+     <button id="mobile-menu-btn" onclick="toggleMobile()" class="md:hidden text-gray-300"> <i data-lucide="menu" class="w-6 h-6"></i> </button>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 flex flex-col gap-3 text-sm">
+     <button onclick="navigateTo('home');toggleMobile()" class="text-left py-2">Inicio</button> 
+     <button onclick="navigateTo('about');toggleMobile()" class="text-left py-2">Acerca de Mí</button> 
+     <button onclick="navigateTo('courses');toggleMobile()" class="text-left py-2">Mis Cursos</button> 
+     <button onclick="navigateTo('university');toggleMobile()" class="text-left py-2">Vida Universitaria</button>
+     <button onclick="navigateTo('cs');toggleMobile()" class="text-left py-2">Computación</button>
+     <button onclick="navigateTo('achievements');toggleMobile()" class="text-left py-2">Mis Logros</button>
+     <button onclick="navigateTo('semester');toggleMobile()" class="text-left py-2">Lo que me llevo</button>
+     <button onclick="navigateTo('reflection');toggleMobile()" class="text-left py-2">Reflexión</button> 
+     <button onclick="navigateTo('comments');toggleMobile()" class="text-left py-2">Comentarios</button>
+    </div>
+   </nav><!-- PAGE: Home -->
+   <div id="page-home" class="page active">
+    <section class="min-h-screen flex items-center justify-center px-6 pt-20 relative">
+     <div class="text-center max-w-3xl">
+      <div class="animate-fade-up delay-1">
+       <div class="inline-block px-8 py-4 rounded-full glass text-5xl font-semibold text-purple-300 mb-0">
+        Bienvenido a mi portafolio
+       </div>
+      </div>
+      <h1 id="el-hero-title" class="text-7xl md:text-8xl font-900 leading-tight mb-6 animate-fade-up delay-2 shimmer-text font-serif">Mi Portafolio Universitario</h1>
+      <p id="el-hero-subtitle" class="text-lg md:text-xl text-gray-400 mb-10 animate-fade-up delay-3 font-light">William García - Introducción a la Ingeniería en Ciencias de la Computación y Tecnologías de la Información</p>
+     </div>
+    </section><!-- About teaser -->
+    <section class="px-6 pb-24">
+     <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4 font-serif bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">Acerca de Mí</h2>
+      <p class="text-gray-400 mb-8 text-lg">Conoce quién soy y muchas cosas más sobre mí</p><button onclick="navigateTo('about')" class="px-8 py-3 rounded-full border border-purple-500/50 text-purple-300 hover:bg-purple-500/10 transition-all font-medium">Descubrir más sobre mí →</button>
+     </div>
+    </section>
+   </div><!-- PAGE: About -->
+   <div id="page-about" class="page">
+    <section class="min-h-screen px-6 pt-28 pb-20">
+     <div class="max-w-4xl mx-auto">
+      <div class="animate-fade-up delay-1">
+       <span class="text-purple-400 text-sm font-medium uppercase tracking-widest">Conociéndome</span>
+       <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-8 font-serif bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">Acerca de Mí</h2>
+      </div>
+      <div class="flex justify-center animate-fade-up delay-2">
+       <div class="max-w-3xl glass rounded-2xl p-8">
+        <p id="el-about-text" class="text-gray-300 leading-relaxed text-lg">Mi nombre es William Andrés García Hernández. Estudié  Bach. en CCLL con orientación en Computación en el Colegio Italiano de Guatemala, carrera en la que terminé de darme cuenta de mi vocaciónn y pasión por la computación y especialmente por el área de redes. Tengo especial interés en el campo de redes, además en la creación y aplicación efectiva  de sistemas para la resolución de problemas, como interés por aparte, también tengo pasión por la música. Al seguir la carrera persigo el sueño de ser uno de los Ingenieros más destacados, así tener acceso a oportunidades muy buenas, a contactos, y poder generar una empresa propia gracias a los conocimientos de vanguardia que me dé la Universidad.</p>
+       </div>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-4 mt-8 animate-fade-up delay-3">
+       <div class="glass rounded-xl p-6 text-center card-hover">
+        <i data-lucide="book-open" class="w-8 h-8 mx-auto mb-3 text-blue-400"></i>
+        <h3 class="font-semibold text-white mb-1">Estudiante</h3>
+        <p class="text-gray-400 text-sm">Comprometido/a con mi formación</p>
+       </div>
+       <div class="glass rounded-xl p-6 text-center card-hover">
+        <i data-lucide="music" class="w-8 h-8 mx-auto mb-3 text-pink-400"></i>
+        <h3 class="font-semibold text-white mb-1">Músico</h3>
+        <p class="text-gray-400 text-sm">Parte de la orquesta universitaria</p>
+       </div>
+       <div class="glass rounded-xl p-6 text-center card-hover">
+        <i data-lucide="target" class="w-8 h-8 mx-auto mb-3 text-purple-400"></i>
+        <h3 class="font-semibold text-white mb-1">En crecimiento</h3>
+        <p class="text-gray-400 text-sm">Siempre buscando mejorar</p>
+       </div>
+      </div>
+      <div class="flex justify-center animate-fade-up delay-2 mt-10">
+       <div class="max-w-3xl glass rounded-2xl p-8">
+        <h2 class="text-2xl font-bold text-white mb-5">Mi primer mes en la Universidad</h2>
+        <p id="el-about-text" class="text-gray-300 leading-relaxed text-lg">Mi primer mes en la universidad ha sido bastante tranquilo, me encantan las instalaciones y ya he encontrado un lugar en el que me gusta pasar todos mis ratos libres. En cuanto a las clases me ha sido fácil adaptarme ya que siguen un modelo de trabajo coherente y constante, donde puedo organizar mis quehaceres para todas las semanas de la misma forma, e incluso en otras semanas son menos tareas por hacer ya que son semanas de parciales o trabajos en clase. Por el lado de la socialización no he forzado las cosas, sino que convivo cordialmente con las personas con quienes recibo clases y con quienes trabajo en grupos. Se me hace bastante interesante la cantidad de recursos que la universidad ofrece a sus estudiantes, por ejemplo, lo que más me sorprendió es que presten tablets para trabajar. No podría mencionar algo que haya sido de especial disgusto para mí, de hecho siento que mis expectativas fueron superadas en todos los aspectos. Todo ello me hace sentirme motivado a aprovechar todo lo que la universidad ofrece y así superarme cada día más en todos los ámbitos posibles.</p>
+       </div>
+      </div>
+     </div>
+    </section>
+   </div><!-- PAGE: Courses -->
+   <div id="page-courses" class="page">
+    <section class="min-h-screen px-6 pt-28 pb-20">
+     <div class="max-w-5xl mx-auto">
+      <div class="animate-fade-up delay-1">
+       <span class="text-pink-400 text-sm font-medium uppercase tracking-widest">Formación Académica</span>
+       <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-10 font-serif bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">Mis Cursos</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 animate-fade-up delay-2">
+       <div class="glass rounded-2xl p-6 card-hover">
+        <div class="flex items-center gap-3 mb-4">
+         <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center"><i data-lucide="code" class="w-5 h-5 text-blue-400"></i>
+         </div>
+         <h3 class="font-semibold text-white text-lg">Intro. a Ing. En Ciencias de la Computación</h3>
+        </div>
+        <p class="text-gray-400 text-sm">A lo largo de este curso he aprendido mucho acerca de diversos temas de conocimiento general de todo buen profesional de la computación. También he aprendido acerca de la importancia de la planificación antes de realizar un proyecto y cómo aplicarla. Además hemos trabajado programación en bloques.</p>
+       </div>
+       <div class="glass rounded-2xl p-6 card-hover">
+        <div class="flex items-center gap-3 mb-4">
+         <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center"><i data-lucide="palette" class="w-5 h-5 text-purple-400"></i>
+         </div>
+         <h3 class="font-semibold text-white text-lg">Algoritmos y Programación Básica</h3>
+        </div>
+        <p class="text-gray-400 text-sm">En estoy aprendido acerca de algoritmos desde el nivel más básico. Y como yo ya sabía programar se me está haciendo fácil. Sin embargo no me parece inútil, sino que ha sido muy buena oportunidad para reforzar el lado teórico de la programación.</p>
+       </div>
+       <div class="glass rounded-2xl p-6 card-hover">
+        <div class="flex items-center gap-3 mb-4">
+         <div class="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center"><i data-lucide="brain" class="w-5 h-5 text-pink-400"></i>
+         </div>
+         <h3 class="font-semibold text-white text-lg">Precálculo</h3>
+        </div>
+        <p class="text-gray-400 text-sm">Hasta este momento, en el curso solo hemos visto contenidos que ya había visto en diversificado. A pesar de ello, me gustaría señalar que me encanta la forma práctica en que las clases son impartidad y que he aprendido muchos trucos para realizar más fácilmente algunos procedimientos.</p>
+       </div>
+       <div class="glass rounded-2xl p-6 card-hover">
+        <div class="flex items-center gap-3 mb-4">
+         <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center"><i data-lucide="flask-conical" class="w-5 h-5 text-cyan-400"></i>
+         </div>
+         <h3 class="font-semibold text-white text-lg">Química General</h3>
+        </div>
+        <p class="text-gray-400 text-sm">Por el lado de la teoría, solo el inicio fue un repaso de todo lo que ví en la carrera. Mientras que a partir de ese punto he estado aprendiendo cosas nuevas, donde muchas son prácticas y lógicas, también de tipo algebraicas, por lo que se me facilita. Por el lado de laboratorio, me gusta que todo está bien planificado y se sigue un patrón para las tareas. Además hemos realizado procedimientos muy interesantes.</p>
+       </div>
+        <div class="glass rounded-2xl p-6 card-hover">
+        <div class="flex items-center gap-3 mb-4">
+         <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center"><i data-lucide="code" class="w-5 h-5 text-blue-400"></i>
+         </div>
+         <h3 class="font-semibold text-white text-lg">Ciencias de la Vida</h3>
+        </div>
+        <p class="text-gray-400 text-sm">Por el lado de teoría, los temas han sido explicados de una forma muy clara. Además, se complementan con el lado de laboratorio y permiten una mejor comprensión de los procedimientos realizados. De los cuales hemos realizado muchos, que me gustan muchísimo.</p>
+       </div>
+        <div class="glass rounded-2xl p-6 card-hover">
+        <div class="flex items-center gap-3 mb-4">
+         <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center"><i data-lucide="code" class="w-5 h-5 text-blue-400"></i>
+         </div>
+         <h3 class="font-semibold text-white text-lg">Comunicación Efectiva</h3>
+        </div>
+        <p class="text-gray-400 text-sm">Este curso me ha servido bastante para la mejora de mi redacción. Y recientemente hemos estado haciendo un artículo de opinión, es decir, pusimos todo lo que vimos en práctica. Además, lo siguiente es la presentación oral, que es un punto en el que sé que debo tranajar bastante, así que me alegra poder hacerlo en el curso.</p>
+       </div>
+      </div><!-- Clase favorita -->
+      <div class="mt-12 animate-fade-up delay-3">
+       <h3 class="text-2xl font-bold mb-6 font-serif text-white flex items-center gap-3"><i data-lucide="star" class="w-6 h-6 text-yellow-400"></i> Mi curso favorito es Precálculo</h3>
+       <div class="glass rounded-2xl p-8 border-l-4 border-purple-500">
+        <p id="el-favorite-class" class="text-gray-300 leading-relaxed text-lg">Es mi curso favorito porque siempre me han encantado las matemáticas. Además, a lo largo de mi vida como estudiante me he encontrado con muchos profesores que no explican las cosas de una forma satisfactoria. Entonces toca que buscar información en internet. Pero en este curso, la catedrática explica las cosas de forma muy completa e incluso nos da claves para que nos sea más fácil realizar los procedimientos.</p>
+       </div>
+      </div>
+     </div>
+    </section>
+   </div><!-- PAGE: University Life -->
+   <div id="page-university" class="page">
+    <section class="min-h-screen px-6 pt-28 pb-20">
+     <div class="max-w-5xl mx-auto">
+      <div class="animate-fade-up delay-1">
+       <span class="text-cyan-400 text-sm font-medium uppercase tracking-widest">Más allá del aula</span>
+       <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-10 font-serif bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">Vida Universitaria</h2>
+      </div><!-- Orquesta -->
+      <div class="animate-fade-up delay-2">
+       <div class="glass rounded-2xl p-8 mb-8">
+        <div class="flex items-center gap-4 mb-6">
+         <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+          <i data-lucide="music" class="w-7 h-7 text-white"></i>
+         </div>
+         <div>
+          <h3 class="text-2xl font-bold text-white font-serif">Orquesta Universitaria</h3>
+          <p class="text-gray-400 text-sm">Mi experiencia musical en la universidad</p>
+         </div>
+        </div>
+        <p id="el-orchestra-text" class="text-gray-300 leading-relaxed text-lg mb-8">Este semestre me uní al club de orquesta de la universidad. En él, toco la flauta transversal. Ya hemos tenido dos mini-presentaciones, una para HCeres y autoridades de la universidad y otra para cerrar el pianotón. Pero aún falta la presentación principal, que será en unas cuantas semanas, lo cual me emociona mucho. Amo pertenecer a esta orquesta porque la música es muy importante para mí, me permite sentirme bien, olvidarme del estrés de otas cosas y las piezas suenan increíble.</p><!-- Image placeholders -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+         <div class="aspect-video rounded-xl overflow-hidden border border-white/10 group">
+          <img src="imgs/orq.jpg"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+        </div>
+         <div class="aspect-video rounded-xl overflow-hidden border border-white/10 group">
+          <img src="imgs/orq1.jpeg"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+        </div>
+        <div class="aspect-video rounded-xl overflow-hidden border border-white/10 group">
+          <img src="imgs/orq2.jpeg"
+            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
+        </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section>
+   </div>
+   <!-- PAGE: Ciencias de la Computación -->
+<div id="page-cs" class="page">
+  <section class="min-h-screen px-6 pt-28 pb-20">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="animate-fade-up delay-1">
+        <span class="text-blue-400 text-sm font-medium uppercase tracking-widest">
+          Mi Concepción
+        </span>
+
+        <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-10 font-serif bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
+          Ciencias de la Computación
+        </h2>
+      </div>
+
+      <div class="glass rounded-2xl p-8">
+        <p class="text-gray-300 leading-relaxed text-lg mb-8">
+          La concepción que he tomado de las ciencias de la computación es que se trata del estudio de todo lo relacionado con la computación, donde eso incluiría el campo más conocido que es el de la programación, pero también comprendería las bases sobre las que se construye ese campo, el funcionamiento de los dispositivos, su optimización, los sistemas que se han creado para operar con las computadoras, y también las aplicaciones que surgen a raíz de todo ello.
+          <br><br>
+          Creo que uno de los puntos más importantes a abordar con respecto a las ciencias de la computación es que todos los campos que aborda tienen como enfoque central la resolución de problemas. Por ello es que un científico de la computación es aquel que utiliza los conocimientos relacionados con la computación para diseñar soluciones a una diversidad de problemas, de modo que además se optimicen lo más posible esas soluciones.
+          <br><br>
+          En este campo, me veo trabajando en el ámbito de desarrollar soluciones a los diversos problemas de vulnerabilidad de los datos y sistemas que atraviesan las empresas. Este problema es bastante grande especialmente en Guatemala, donde la ciberseguridad es un campo en expansión. Así pues, utilizaría mis conocimientos para diseñar sistemas seguros y también para detectar y solucionar vulnerabilidades. Además pienso que utilizaría bastantes conocimientos acerca de redes y el envío de paquetes, siendo el tema de networks mi preferido en el campo de la computación.
+        </p>
+
+        <div class="flex justify-center">
+          <div class="w-full md:w-2/3 aspect-video rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-gray-500">
+            <img src="imgs/compu.jpg">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PAGE: Mis Logros -->
+<div id="page-achievements" class="page">
+  <section class="min-h-screen px-6 pt-28 pb-20">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="animate-fade-up delay-1">
+        <span class="text-emerald-400 text-sm font-medium uppercase tracking-widest">
+          Destacados del semestre
+        </span>
+
+        <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-10 font-serif bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-300 bg-clip-text text-transparent">
+          Mis Logros
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+
+        <div class="glass rounded-2xl p-8 card-hover">
+          <h3 class="text-xl font-bold text-white mb-4">
+            Intro. a Ing. en Ciencias de la Computación
+          </h3>
+
+          <p class="text-gray-300 leading-relaxed mb-6">
+            En este curso destaco el desarrollo de un videojuego haciendo uso de Greenfoot, donde se creó un videojuego de tipo bullet hell y se aprendió a generar clases y actores para fungir de enemigos, jugadores, proyectiles, etc.
+            <br><br>
+            Así también se aprendió a programar en Java para que se detecten colisiones y se implementen funcionalidades como una barra de progreso, un puntaje y una pantalla de game over.
+            <br><br>
+            En este proyecto, el aprendizaje más importante que tuve fue aprender a utilizar Git y un repositorio en GitHub para trabajar de una forma mucho más cómoda y eficaz junto a mi grupo de trabajo.
+          </p>
+
+          <div class="aspect-video rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-gray-500">
+            <img src="imgs/prointro.png">
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-8 card-hover">
+          <h3 class="text-xl font-bold text-white mb-4">
+            Ciencias de la Vida
+          </h3>
+
+          <p class="text-gray-300 leading-relaxed mb-6">
+            En este curso uno de los trabajos a destacar es el laboratorio No. 13, correspondiente a la visita que se realizó a la colección biológica UVG y al jardín botánico UVG.
+            <br><br>
+            De estas visitas se obtuvieron muchos conocimientos y se analizaron las características de los organismos observados.
+            <br><br>
+            También se puede destacar la nota máxima obtenida en grupo para el caso integrador número 3.
+          </p>
+
+          <div class="aspect-video rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-gray-500">
+            <img src="imgs/probio.png">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- PAGE: Lo que me llevo -->
+<div id="page-semester" class="page">
+  <section class="min-h-screen px-6 pt-28 pb-20">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="animate-fade-up delay-1">
+        <span class="text-purple-400 text-sm font-medium uppercase tracking-widest">
+          Reflexión personal
+        </span>
+
+        <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-10 font-serif bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
+          Lo que me llevo de este semestre
+        </h2>
+      </div>
+
+      <div class="glass rounded-2xl p-8">
+        <p class="text-gray-300 leading-relaxed text-lg">
+          De este semestre me llevo mucha motivación, puesto que me ha encantado la metodología y la calidad de enseñanza que tiene la universidad, sumado a que me fue increíblemente bien. También en este semestre he definido mejor mi forma de trabajar.
+          <br><br>
+          En cuanto al área de mi carrera, me he quedado muy satisfecho con los conocimientos obtenidos y con el deseo de aprender muchísimo más; por ello es que he reconfirmado mi deseo de seguir esta carrera universitaria.
+          <br><br>
+          Así también me he quedado con el deseo de conocer a muchas más personas, para encontrar aquellas con las que pueda generar una gran confianza.
+        </p>
+      </div>
+
+    </div>
+  </section>
+</div>
+   <!-- PAGE: Reflection -->
+   <div id="page-reflection" class="page">
+    <section class="min-h-screen px-6 pt-28 pb-20">
+     <div class="max-w-5xl mx-auto">
+      <div class="animate-fade-up delay-1">
+       <span class="text-purple-400 text-sm font-medium uppercase tracking-widest">Mirando hacia atrás</span>
+       <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-10 font-serif bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">Reflexión del Ciclo</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+       <div class="glass rounded-2xl p-8 card-hover animate-fade-up delay-2 border-t-4 border-emerald-400">
+        <div class="flex items-center gap-3 mb-4">
+         <i data-lucide="check-circle" class="w-7 h-7 text-emerald-400"></i>
+         <h3 class="text-xl font-bold text-white">Lo que salió bien</h3>
+        </div>
+        <p id="el-went-well" class="text-gray-300 leading-relaxed">Durante este ciclo he tenido buenos logros, como sacar excelentes calificaciones en parciales de precálculo y química. También tener el 100% de calificación en Intro a la Compu. Y agregaría que he sido capaz de organizar mis tiempos para dormir temprano.</p>
+       </div>
+       <div class="glass rounded-2xl p-8 card-hover animate-fade-up delay-3 border-t-4 border-red-400">
+        <div class="flex items-center gap-3 mb-4">
+         <i data-lucide="alert-circle" class="w-7 h-7 text-red-400"></i>
+         <h3 class="text-xl font-bold text-white">Lo que salió mal</h3>
+        </div>
+        <p id="el-went-wrong" class="text-gray-300 leading-relaxed">Como cosas que salieron mal podría mencionar que no tuve la disciplina para mantenerme hacinedo ejercicio de forma constante. También que en algunos proyectos grupales no ha habido el mismo interés en ellos por parte de algunos integrantes y eso hace que la mayor carga recaiga sobre quienes si nos interesamos más.</p>
+       </div>
+       <div class="glass rounded-2xl p-8 card-hover animate-fade-up delay-4 border-t-4 border-blue-400">
+        <div class="flex items-center gap-3 mb-4">
+         <i data-lucide="lightbulb" class="w-7 h-7 text-blue-400"></i>
+         <h3 class="text-xl font-bold text-white">Qué he aprendido</h3>
+        </div>
+        <p id="el-learned" class="text-gray-300 leading-relaxed">He aprendido a trabar en equipo, redactar, opinar, estructurar mejor textos y a comunicarme oralmente de la mejor manera. He aprendido a realizar informes científicos, a citar correctamente en APA7, a planificar la creación de un algoritmo y mucho más.</p>
+       </div>
+       <div class="glass rounded-2xl p-8 card-hover animate-fade-up delay-5 border-t-4 border-amber-400">
+        <div class="flex items-center gap-3 mb-4">
+         <i data-lucide="help-circle" class="w-7 h-7 text-amber-400"></i>
+         <h3 class="text-xl font-bold text-white">Qué me dejó con dudas</h3>
+        </div>
+        <p id="el-doubts" class="text-gray-300 leading-relaxed">Principalmente algunos temas de química general, pues ha habido temas que he necesitado estudiar también con videos y con ChatGPT explicandome. Y luego por falta de tiempo, no he terminado de entender todos los conceptos al 100%.</p>
+       </div>
+      </div>
+     </div>
+    </section>
+   </div><!-- PAGE: Comments -->
+   <div id="page-comments" class="page">
+    <section class="min-h-screen px-6 pt-28 pb-20">
+     <div class="max-w-4xl mx-auto">
+      <div class="animate-fade-up delay-1">
+       <span class="text-pink-400 text-sm font-medium uppercase tracking-widest">Opiniones</span>
+       <h2 class="text-4xl md:text-5xl font-bold mt-2 mb-4 font-serif bg-gradient-to-r from-pink-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent">Comentarios</h2>
+       <p class="text-gray-400 mb-10">Lo que dicen mis familiares y personas cercanas sobre mi portafolio</p>
+      </div>
+      <div id="comments-list" class="space-y-4 animate-fade-up delay-2">
+       <!-- Sample comments -->
+       <div class="comment-card glass rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+         <div class="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 text-white font-bold">
+          M
+         </div>
+         <div>
+          <h4 class="font-semibold text-white">Karin Hernández</h4>
+          <p class="text-gray-400 text-sm mt-1">Estoy muy orgullosa de todo lo que has logrado, simplemente con que estés en esa universidad, sigue esforzandote y aprendiendo mucho!</p>
+         </div>
+        </div>
+       </div>
+       <div class="comment-card glass rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+         <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 text-white font-bold">
+          P
+         </div>
+         <div>
+          <h4 class="font-semibold text-white">Salvador García</h4>
+          <p class="text-gray-400 text-sm mt-1">Me alegro mucho por ti. Aprovecha está oportunidad.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section>
+   </div><!-- Footer -->
+   <footer class="w-full py-8 text-center text-gray-500 text-sm border-t border-white/5">
+    <p>✦ Mi Portafolio Universitario — Hecho con dedicación y cariño</p>
+   </footer>
+  </div>
+  <script>
+    // Navigation
+    function navigateTo(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + pageId).classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-link'));
+      const activeNav = document.querySelector(`.nav-link[data-nav="${pageId}"]`);
+      if (activeNav) activeNav.classList.add('active-link');
+      document.getElementById('app-wrapper').scrollTo({ top: 0, behavior: 'smooth' });
+      // Re-trigger animations
+      const page = document.getElementById('page-' + pageId);
+      page.querySelectorAll('.animate-fade-up').forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = '';
+      });
+    }
+
+    function toggleMobile() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    }
+
+    // Add comment
+    const colors = [
+      'from-purple-500 to-pink-500', 'from-blue-500 to-cyan-500',
+      'from-pink-500 to-rose-500', 'from-indigo-500 to-purple-500',
+      'from-cyan-500 to-blue-500'
+    ];
+    function addComment(e) {
+      e.preventDefault();
+      const name = document.getElementById('commenter-name').value.trim();
+      const relation = document.getElementById('commenter-relation').value.trim();
+      const message = document.getElementById('commenter-message').value.trim();
+      if (!name || !message) return;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const card = document.createElement('div');
+      card.className = 'comment-card glass rounded-2xl p-6';
+      card.innerHTML = `
+        <div class="flex items-start gap-4">
+          <div class="w-11 h-11 rounded-full bg-gradient-to-br ${color} flex items-center justify-center flex-shrink-0 text-white font-bold">${name[0].toUpperCase()}</div>
+          <div>
+            <h4 class="font-semibold text-white">${name}${relation ? ` <span class="text-gray-500 font-normal text-sm">· ${relation}</span>` : ''}</h4>
+            <p class="text-gray-400 text-sm mt-1">${message}</p>
+          </div>
+        </div>`;
+      document.getElementById('comments-list').appendChild(card);
+      e.target.reset();
+    }
+
+    // Default config
+    const defaultConfig = {
+      hero_title: 'Mi Portafolio Universitario',
+      hero_subtitle: 'Un recorrido por mi experiencia académica, mis aprendizajes y mi crecimiento personal',
+      about_text: 'Soy una persona apasionada por aprender y crecer. Este portafolio refleja mi trayectoria universitaria, mis intereses, logros y los aprendizajes más significativos que he tenido durante este ciclo. Me encanta la música, el conocimiento y los retos que me hacen mejor cada día.',
+      favorite_class: 'Aquí puedes escribir sobre tu clase favorita: qué la hizo especial, qué aprendiste, quién la impartía y por qué la recuerdas con tanto cariño.',
+      key_learnings: 'Escribe aquí los aprendizajes que más te impactaron, habilidades nuevas que desarrollaste o conocimientos que cambiaron tu perspectiva.',
+      orchestra_text: 'Describe tu participación en la orquesta universitaria: qué instrumento tocas, desde cuándo participas, qué presentaciones has tenido y qué significa la música para ti.',
+      went_well: 'Escribe aquí tus logros, las cosas que funcionaron, los momentos donde sentiste orgullo y satisfacción por tu desempeño este ciclo.',
+      went_wrong: 'Describe las dificultades que enfrentaste, los obstáculos que no pudiste superar del todo y las áreas donde sientes que podrías haber mejorado.',
+      learned: 'Comparte las lecciones más valiosas de este ciclo, tanto académicas como personales. ¿Qué te llevas contigo?',
+      doubts: 'Anota aquí los temas o situaciones que aún no comprendes completamente y que te gustaría explorar en el futuro.',
+      background_color: '#0a0618',
+      surface_color: 'rgba(255,255,255,0.05)',
+      text_color: '#e5e7eb',
+      primary_action_color: '#7c3aed',
+      secondary_action_color: '#ec4899',
+      font_family: 'Outfit',
+      font_size: 16
+    };
+
+    function applyConfig(config) {
+      const get = (k) => config[k] || defaultConfig[k];
+      document.getElementById('el-hero-title').textContent = get('hero_title');
+      document.getElementById('el-hero-subtitle').textContent = get('hero_subtitle');
+      document.getElementById('el-about-text').textContent = get('about_text');
+      document.getElementById('el-favorite-class').textContent = get('favorite_class');
+      document.getElementById('el-key-learnings').textContent = get('key_learnings');
+      document.getElementById('el-orchestra-text').textContent = get('orchestra_text');
+      document.getElementById('el-went-well').textContent = get('went_well');
+      document.getElementById('el-went-wrong').textContent = get('went_wrong');
+      document.getElementById('el-learned').textContent = get('learned');
+      document.getElementById('el-doubts').textContent = get('doubts');
+
+      const font = get('font_family');
+      const baseSize = get('font_size');
+      document.body.style.fontFamily = `${font}, Outfit, sans-serif`;
+      document.querySelectorAll('.font-serif').forEach(el => {
+        el.style.fontFamily = `DM Serif Display, ${font}, serif`;
+      });
+      document.body.style.fontSize = baseSize + 'px';
+    }
+
+    // Element SDK init
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => applyConfig(config),
+      mapToCapabilities: (config) => {
+        const c = (key) => ({
+          get: () => config[key] || defaultConfig[key],
+          set: (v) => { config[key] = v; window.elementSdk.setConfig({ [key]: v }); }
+        });
+        return {
+          recolorables: [c('background_color'), c('surface_color'), c('text_color'), c('primary_action_color'), c('secondary_action_color')],
+          borderables: [],
+          fontEditable: c('font_family'),
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+          }
+        };
+      },
+      mapToEditPanelValues: (config) => {
+        const m = new Map();
+        ['hero_title','hero_subtitle','about_text','favorite_class','key_learnings','orchestra_text','went_well','went_wrong','learned','doubts'].forEach(k => {
+          m.set(k, config[k] || defaultConfig[k]);
+        });
+        return m;
+      }
+    });
+
+    lucide.createIcons();
+    document.querySelector('.nav-link[data-nav="home"]').classList.add('active-link');
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e1e728023da67b1',t:'MTc3NDQ0NzI4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
